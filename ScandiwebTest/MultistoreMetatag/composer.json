@@ -1,0 +1,22 @@
+{
+    "name": "scandiwebtest/module-multistoremetatag",
+    "description": "",
+    "type": "magento2-module",
+    "license": "OSL-3.0",
+    "authors": [
+        {
+            "name": "Iago Lima",
+            "email": "iiagolima@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "ScandiwebTest\\MultistoreMetatag\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}
