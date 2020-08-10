@@ -49,6 +49,9 @@ class Metatag extends Template
     }
 
     /**
+     * After checking if the page is Cms and page is used in more then 1 store
+     * It calls the foreach to pass by every store and concatenates all the metatags inside 1 variable so it can be
+     * Returned to the head of the DOM
      * @return string
      */
     protected function _toHtml()
@@ -66,19 +69,13 @@ class Metatag extends Template
     }
 
     /**
+     * Recieve $store so it can search inside core_config_data for the right store.
      * @param StoreInterface $store
      * @return mixed
      */
     public function getStoreLanguage($store) {
         $locale = $this->_scopeConfig->getValue('general/locale/code', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store->getId());
         return $locale;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPageUrl() {
-        return $this->_urlBuilder->getUrl(null, ['_direct' => $this->page->getIdentifier()]);
     }
 
     /**
@@ -96,6 +93,8 @@ class Metatag extends Template
     }
 
     /**
+     * Checks whether the page has different Stores on it or the first store is 0(default store)
+     * If the first store is 0 then it returns the result of count($stores) > 1 to see if there are more then 1 store inside the magento installation
      * @return bool
      */
     protected function isPageUsedInMultiStores() {
@@ -114,6 +113,7 @@ class Metatag extends Template
     }
 
     /**
+     * Return the current param page_id
      * @return mixed
      */
     protected function getPageId() {
