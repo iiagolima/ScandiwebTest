@@ -7,6 +7,7 @@ use Magento\Cms\Helper\Page;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Store\Api\Data\StoreInterface;
 
 /**
  * Class Metatag
@@ -53,17 +54,24 @@ class Metatag extends Template
     protected function _toHtml()
     {
         if($this->isPageCms() && $this->isPageUsedInMultiStores()) {
-            return parent::_toHtml();
+            $metaTagHtml = '';
+            foreach ($this->_storeManager->getStores() as $store) {
+                $storeBaseUrl = $store->getBaseUrl();
+                $metaTagHtml .= '<link rel="alternate" hreflang="' . $this->getStoreLanguage($store) . '" href="' . $storeBaseUrl . $this->page->getIdentifier() . '" />';
+            }
+            return $metaTagHtml;
         }
 
         return '';
     }
 
     /**
-     * @return string
+     * @param StoreInterface $store
+     * @return mixed
      */
-    public function getStoreLanguage() {
-        return $this->localeResolver->getLocale();
+    public function getStoreLanguage($store) {
+        $locale = $this->_scopeConfig->getValue('general/locale/code', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store->getId());
+        return $locale;
     }
 
     /**
@@ -94,14 +102,9 @@ class Metatag extends Template
         try {
             $this->page = $this->pageRepository->getById($this->getPageId());
 
-            if (count($this->page->getStoreId()) > 1) {
-                return true;
-            } else {
-                $firstStore = $this->page->getStoreId(0);
-                if ($firstStore === '0') {
-                    $stores = $this->_storeManager->getStores();
-                    return count($stores) > 1;
-                }
+            if (count($this->page->getStoreId()) > 1 || $this->page->getStoreId(0) === '0') {
+                $stores = $this->_storeManager->getStores();
+                return count($stores) > 1;
             }
 
             return false;
